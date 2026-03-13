@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Sort
@@ -58,8 +57,8 @@ fun TasksListScreen(
     viewModel: TasksListViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+//    val filterState by viewModel.filterState.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val listState = rememberLazyListState()
 
     LaunchedEffect(Unit) {
         viewModel.uiEvent.collect { event ->
@@ -83,10 +82,6 @@ fun TasksListScreen(
         }
     }
 
-    LaunchedEffect(uiState.sortOption) {
-        listState.scrollToItem(0)
-    }
-
 
     if (uiState.isLoading) {
         Box(
@@ -96,120 +91,92 @@ fun TasksListScreen(
             LoadingIndicator()
         }
     } else {
-        Column(
+        LazyColumn(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
         ) {
+            item {
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                TextField(
-                    value = uiState.searchQuery,
-                    onValueChange = { viewModel.updateSearchQuery(it) },
-                    modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(12.dp)
-                )
-                IconButton(
-                    onClick = {
-                        viewModel.updateShowSortDropDown(true)
-                    },
-                    shape = RoundedCornerShape(12.dp)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Default.Sort,
-                        contentDescription = "sort the tasks"
+                    TextField(
+                        value = uiState.searchQuery,
+                        onValueChange = { viewModel.updateSearchQuery(it) },
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(12.dp)
                     )
-                }
-
-                DropdownMenu(
-                    expanded = uiState.showSortDropDown,
-                    onDismissRequest = {
-                        viewModel.updateShowSortDropDown(false)
-                    },
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    SortOption.entries.forEach { sortOption ->
-                        val isSelected = uiState.sortOption==sortOption
-                        DropdownMenuItem(
-                            selected = isSelected,
+                    Box {
+                        IconButton(
                             onClick = {
-                                viewModel.updateSortOption(sortOption)
+                                viewModel.updateShowSortDropDown(true)
+                            },
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Default.Sort,
+                                contentDescription = "sort the tasks"
+                            )
+                        }
+
+                        DropdownMenu(
+                            expanded = uiState.showSortDropDown,
+                            onDismissRequest = {
                                 viewModel.updateShowSortDropDown(false)
                             },
-                            text = {
-                                Text(
-                                    sortOption.text
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            SortOption.entries.forEach { sortOption ->
+                                val isSelected = uiState.sortOption == sortOption
+                                DropdownMenuItem(
+                                    selected = isSelected,
+                                    onClick = {
+                                        viewModel.updateSortOption(sortOption)
+                                        viewModel.updateShowSortDropDown(false)
+                                    },
+                                    text = {
+                                        Text(
+                                            sortOption.text
+                                        )
+                                    },
+                                    shapes = MenuDefaults.itemShapes(shape = RoundedCornerShape(8.dp)),
+                                    leadingIcon = {
+                                        if (isSelected) {
+                                            Icon(
+                                                imageVector = Icons.Default.Check,
+                                                contentDescription = null
+                                            )
+                                        }
+                                    }
                                 )
-                            },
-                            shapes = MenuDefaults.itemShapes(shape = RoundedCornerShape(8.dp)),
-                            leadingIcon = {
-                                if(isSelected){
-                                    Icon(
-                                        imageVector = Icons.Default.Check,
-                                        contentDescription = null
-                                    )
-                                }
                             }
-                        )
-                    }
-                }
-
-
-            }
-            LazyColumn(
-                modifier = Modifier.weight(1f),
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
-                verticalArrangement = Arrangement.spacedBy(18.dp),
-                state = listState
-            ) {
-                val dailyTasks = uiState.tasks
-                val tasks = if(uiState.searchQuery.isEmpty()) dailyTasks else dailyTasks.filter { it.title.contains(uiState.searchQuery) }
-                val sortedTasks = when(uiState.sortOption){
-                    SortOption.NEWEST_FIRST -> {
-                        tasks
-                    }
-
-                    SortOption.OLDEST_FIRST -> {
-                        tasks.sortedBy { it.englishDate }
-                    }
-
-                    SortOption.WORK_TIME_HIGH_TO_LOW -> {
-                        tasks.sortedByDescending { it.totalTaskDuration }
-                    }
-
-                    SortOption.WORK_TIME_LOW_TO_HIGH -> {
-                        tasks.sortedBy { it.totalTaskDuration }
-                    }
-
-                    SortOption.SATIS_PER_HIGH_TO_LOW -> {
-                        tasks.sortedByDescending { it.satisfyPercentage.text }
-                    }
-
-                    SortOption.SATIS_PER_LOW_TO_HIGH -> {
-                        tasks.sortedBy { it.satisfyPercentage.text }
-                    }
-                }
-                items(items = sortedTasks, key = { it.id }) { dailyTask ->
-                    DailyTaskItem(
-                        dailyTask = dailyTask,
-                        totalDurationFormatted = viewModel.millisToFormattedDuration(dailyTask.totalTaskDuration),
-                        onEditClick = {
-                            viewModel.onUpdateTaskClick(it)
-                        },
-                        onDeleteClick = {
-                            viewModel.updateShowDeleteDialog(true)
-                            viewModel.updateTaskToDeleteId(it)
-                        },
-                        formatedDate = { millis, isOnlyDate ->
-                            viewModel.formatedDate(millis, isOnlyDate)
                         }
-                    )
+                    }
+
+
                 }
+            }
+
+            items(items = uiState.tasks, key = { it.id }) { dailyTask ->
+                DailyTaskItem(
+                    dailyTask = dailyTask,
+                    totalDurationFormatted = viewModel.millisToFormattedDuration(dailyTask.totalTaskDuration),
+                    onEditClick = {
+                        viewModel.onUpdateTaskClick(it)
+                    },
+                    onDeleteClick = {
+                        viewModel.updateShowDeleteDialog(true)
+                        viewModel.updateTaskToDeleteId(it)
+                    },
+                    formatedDate = { millis, isOnlyDate ->
+                        viewModel.formatedDate(millis, isOnlyDate)
+                    }
+                )
             }
         }
     }

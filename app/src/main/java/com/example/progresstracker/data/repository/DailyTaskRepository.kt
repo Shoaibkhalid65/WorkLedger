@@ -117,14 +117,9 @@ class DailyTaskRepository @Inject constructor(
 
     fun observeAllRealTasks(): Flow<List<DailyTask>> {
         return dailyTaskDao.getRealDailyTasks().map { dailyTasks ->
-            dailyTasks.map {
-                withContext(dispatcher) {
-                    it.toModel(
-                        taskDurationDao.getAllDurationsByTaskId(
-                            it.id
-                        ).first()
-                    )
-                }
+            dailyTasks.map { dailyTaskEntity ->
+                val durations = taskDurationDao.getAllDurationsByTaskId(dailyTaskEntity.id).first()
+                dailyTaskEntity.toModel(durations)
             }
         }
     }

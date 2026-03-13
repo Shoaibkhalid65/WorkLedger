@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -47,6 +48,7 @@ fun DailyTaskMainScreen(
     val context = LocalContext.current
 
     val isTasksScreen = pagerState.currentPage == 0
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -71,6 +73,7 @@ fun DailyTaskMainScreen(
                     ) { Icon(Icons.Default.Delete, null) }
                 },
                 windowInsets = WindowInsets(),
+                scrollBehavior = scrollBehavior
             )
         },
         floatingActionButton = {

@@ -1,6 +1,5 @@
 package com.example.progresstracker.ui.gaols
 
-import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.progresstracker.data.repository.GoalRepository
@@ -10,6 +9,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -30,6 +30,8 @@ class GoalsListViewModel @Inject constructor(
     private val _events = MutableSharedFlow<GoalsUiEvent>()
     val events = _events.asSharedFlow()
 
+    private val _filterState = MutableStateFlow(GoalFilterState())
+
 
     init {
         loadGoals()
@@ -37,17 +39,51 @@ class GoalsListViewModel @Inject constructor(
 
     private fun loadGoals() {
         viewModelScope.launch {
-            repository.observeAllGoals().collect { goals ->
+//            repository.observeAllGoals().collect { goals ->
+//                _goalsUiState.update { uiState ->
+//                    uiState.copy(
+//                        isLoading = false,
+//                        allGoals = goals,
+//                        completedGoals = goals.filter { it.isCompleted },
+//                        pendingGoals = goals.filterNot { it.isCompleted }
+//                    )
+//                }
+//            }
+            repository.observeAllGoals().combine(_filterState){ goals,filterState ->
+                 applyFilters(goals,filterState)
+            }.collect { goals->
                 _goalsUiState.update { uiState ->
                     uiState.copy(
                         isLoading = false,
                         allGoals = goals,
                         completedGoals = goals.filter { it.isCompleted },
-                        pendingGoals = goals.filterNot { it.isCompleted  }
+                        pendingGoals = goals.filterNot { it.isCompleted },
+                        searchQuery = _filterState.value.searchQuery,
+                        sortOption = _filterState.value.sortOption
                     )
                 }
             }
         }
+    }
+
+    private fun applyFilters(goals: List<Goal>, filterState: GoalFilterState): List<Goal> {
+        var filteredGoals= goals
+
+        if(filterState.searchQuery.isNotBlank()){
+            filteredGoals=filteredGoals.filter {
+                it.title.contains(filterState.searchQuery, ignoreCase = true)
+            }
+        }
+
+        filteredGoals = when(filterState.sortOption){
+            GoalSortOption.NEWEST_FIRST -> filteredGoals.sortedByDescending { it.createdAt }
+            GoalSortOption.OLDEST_FIRST -> filteredGoals.sortedBy { it.createdAt }
+            GoalSortOption.URGENCY_LEVEL -> filteredGoals.sortedBy { it.urgencyLevel }
+            GoalSortOption.IMPORTANCE_LEVEL -> filteredGoals.sortedBy { it.importanceLevel }
+            GoalSortOption.DIFFICULTY_LEVEL -> filteredGoals.sortedBy { it.difficultyLevel }
+        }
+
+        return filteredGoals
     }
 
     fun onEditGoalClick(goalId: Long) {
@@ -137,6 +173,24 @@ class GoalsListViewModel @Inject constructor(
         _goalsUiState.update { it.copy(goalToDeleteId = id) }
     }
 
+    fun updateSearchQuery(query: String) {
+        _filterState.update {
+            it.copy(searchQuery = query)
+        }
+    }
+
+    fun updateSortOption(sortOption: GoalSortOption) {
+        _filterState.update {
+            it.copy(sortOption = sortOption)
+        }
+    }
+
+    fun updateShowSortDropDown(showDropDown: Boolean) {
+        _goalsUiState.update {
+            it.copy(showSortDropDown = showDropDown)
+        }
+    }
+
     fun formatedDate(epochMillis: Long, isOnlyDateRequired: Boolean = false): String {
         val instant = Instant.ofEpochMilli(epochMillis)
         val localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
@@ -148,8 +202,6 @@ class GoalsListViewModel @Inject constructor(
     }
 
 }
-
-
 
 
 sealed class GoalsUiEvent {
@@ -172,5 +224,22 @@ data class GoalUiState(
     val completionDate: Long = 0L,
     val showDeleteDialog: Boolean = false,
     val showDeleteAllDialog: Boolean = false,
-    val goalToDeleteId: Long = -1L
+    val goalToDeleteId: Long = -1L,
+    val searchQuery: String = "",
+    val sortOption: GoalSortOption = GoalSortOption.NEWEST_FIRST,
+    val showSortDropDown: Boolean = false
+)
+
+
+enum class GoalSortOption(val text: String) {
+    NEWEST_FIRST("Newest First"),
+    OLDEST_FIRST("Oldest First"),
+    URGENCY_LEVEL("Urgency ↓"),
+    DIFFICULTY_LEVEL("Difficulty ↓"),
+    IMPORTANCE_LEVEL("Importance ↓")
+}
+
+data class GoalFilterState(
+    val searchQuery: String = "",
+    val sortOption: GoalSortOption = GoalSortOption.NEWEST_FIRST
 )

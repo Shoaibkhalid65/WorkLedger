@@ -20,7 +20,9 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Edit
@@ -28,6 +30,8 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingActionButton
@@ -35,10 +39,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -48,6 +54,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -68,13 +75,6 @@ fun GoalsListScreen(
 
     val uiState by goalsListViewModel.goalsUiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
-//    var showDeleteDialog by remember { mutableStateOf(false) }
-//    var showDeleteAllDialog by remember { mutableStateOf(false) }
-//    var goalToDeleteId by remember { mutableLongStateOf(-1) }
-
-//    val allGoals by goalsListViewModel.allGoals.collectAsStateWithLifecycle()
-//    val pendingGoals by goalsListViewModel.pendingGoals.collectAsStateWithLifecycle()
-//    val completedGoals by goalsListViewModel.completedGoals.collectAsStateWithLifecycle()
 
     val tabs = remember { listOf("All", "Pending", "Completed") }
 
@@ -185,6 +185,46 @@ fun GoalsListScreen(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)
                     ) {
+                        item {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(
+                                    10.dp,
+                                    Alignment.CenterHorizontally
+                                )
+                            ) {
+                                TextField(
+                                    value = uiState.searchQuery,
+                                    onValueChange = {
+                                        goalsListViewModel.updateSearchQuery(it)
+                                    },
+                                    modifier = Modifier.weight(1f),
+                                    shape = RoundedCornerShape(12.dp)
+                                )
+                                Box(modifier = Modifier.clip(RoundedCornerShape(12.dp))) {
+                                    IconButton(onClick = {
+                                        goalsListViewModel.updateShowSortDropDown(true)
+                                    }) {
+                                        Icon(
+                                            imageVector = Icons.AutoMirrored.Default.Sort,
+                                            contentDescription = null
+                                        )
+                                    }
+
+                                    GoalsSortDropDown(
+                                        sortOption = uiState.sortOption,
+                                        showDropDown = uiState.showSortDropDown,
+                                        onDismiss = {
+                                            goalsListViewModel.updateShowSortDropDown(false)
+                                        },
+                                        onSortOptionUpdated = {
+                                            goalsListViewModel.updateSortOption(it)
+                                        }
+                                    )
+                                }
+                            }
+                        }
                         items(
                             items = when (index) {
                                 0 -> uiState.allGoals
@@ -456,6 +496,41 @@ fun DeleteDialog(
             )
         }
     )
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun GoalsSortDropDown(
+    sortOption: GoalSortOption,
+    showDropDown: Boolean,
+    onDismiss: () -> Unit,
+    onSortOptionUpdated: (GoalSortOption) -> Unit
+) {
+    DropdownMenu(
+        expanded = showDropDown,
+        onDismissRequest = onDismiss
+    ) {
+        GoalSortOption.entries.forEach { option ->
+            val isSelected = sortOption == option
+            DropdownMenuItem(
+                text = { Text(option.text) },
+                onClick = {
+                    onSortOptionUpdated(option)
+                    onDismiss()
+                },
+                selected = isSelected,
+                shapes = MenuDefaults.itemShapes(),
+                leadingIcon = {
+                    if (isSelected) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = null
+                        )
+                    }
+                }
+            )
+        }
+    }
 }
 
 

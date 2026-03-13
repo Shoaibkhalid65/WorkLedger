@@ -1,22 +1,19 @@
 package com.example.progresstracker.ui.dailyTask.tasksList
 
+import android.os.SystemClock
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.progresstracker.data.repository.DailyTaskRepository
 import com.example.progresstracker.model.DailyTask
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -32,63 +29,59 @@ class TasksListViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(TasksListUiState())
     val uiState = _uiState.asStateFlow()
 
-
     private val _uiEvent = MutableSharedFlow<TasksListUiEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
 
-    val dailyTasks = repository.observeAllRealTasks().stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = emptyList()
-    )
+    private val _filterState = MutableStateFlow(FilterState())
 
     init {
         loadDailyTasks()
     }
 
-
     private fun loadDailyTasks() {
         viewModelScope.launch {
-            repository.observeAllRealTasks().sortTasks(_uiState.value.sortOption).collect { dailyTasks ->
-//                val query=_uiState.value.searchQuery
-//                val filteredTasks= if(query.isEmpty()) dailyTasks else dailyTasks.filter { it.title.contains(_uiState.value.searchQuery) }
+            repository.observeAllRealTasks().combine(
+                _filterState
+            ) { tasks, filterState ->
+                applyFilters(tasks, filterState)
+            }.collect { filteredTasks ->
                 _uiState.update {
-                    it.copy(tasks = dailyTasks, isLoading = false)
+                    it.copy(
+                        tasks = filteredTasks,
+                        isLoading = false,
+                        searchQuery = _filterState.value.searchQuery,
+                        sortOption = _filterState.value.sortOption
+                    )
                 }
             }
         }
     }
 
-    private fun Flow<List<DailyTask>>.sortTasks(sortOption: SortOption): Flow<List<DailyTask>> {
-        return map { tasks ->
-            when (sortOption) {
-                SortOption.NEWEST_FIRST -> {
-                    tasks
-                }
 
-                SortOption.OLDEST_FIRST -> {
-                    tasks.sortedBy { it.englishDate }
-                }
+    private fun applyFilters(
+        tasks: List<DailyTask>,
+        filterState: FilterState
+    ): List<DailyTask> {
+        var filteredTasks = tasks
 
-                SortOption.WORK_TIME_HIGH_TO_LOW -> {
-                    tasks.sortedByDescending { it.totalTaskDuration }
-                }
-
-                SortOption.WORK_TIME_LOW_TO_HIGH -> {
-                    tasks.sortedBy { it.totalTaskDuration }
-                }
-
-                SortOption.SATIS_PER_HIGH_TO_LOW -> {
-                    tasks.sortedByDescending { it.satisfyPercentage.text }
-                }
-
-                SortOption.SATIS_PER_LOW_TO_HIGH -> {
-                    tasks.sortedBy { it.satisfyPercentage.text }
-                }
+        if (filterState.searchQuery.isNotBlank()) {
+            filteredTasks = filteredTasks.filter {
+                it.title.contains(filterState.searchQuery, ignoreCase = true)
             }
         }
-    }
 
+        filteredTasks = when (filterState.sortOption) {
+            SortOption.NEWEST_FIRST -> filteredTasks.sortedByDescending { it.englishDate }
+            SortOption.OLDEST_FIRST -> filteredTasks.sortedBy { it.englishDate }
+            SortOption.WORK_TIME_HIGH_TO_LOW -> filteredTasks.sortedByDescending { it.totalTaskDuration }
+            SortOption.WORK_TIME_LOW_TO_HIGH -> filteredTasks.sortedBy { it.totalTaskDuration }
+            SortOption.SATIS_PER_HIGH_TO_LOW -> filteredTasks.sortedByDescending { it.satisfyPercentage.text }
+            SortOption.SATIS_PER_LOW_TO_HIGH -> filteredTasks.sortedBy { it.satisfyPercentage.text }
+
+        }
+
+        return filteredTasks
+    }
 
 
     fun onUpdateTaskClick(taskId: Long) {
@@ -167,6 +160,7 @@ class TasksListViewModel @Inject constructor(
             Instant.ofEpochMilli(millis),
             ZoneId.systemDefault()
         )
+
         return String.format(
             Locale.getDefault(),
             "%02d:%02d",
@@ -202,18 +196,18 @@ class TasksListViewModel @Inject constructor(
     }
 
     fun updateSearchQuery(searchQuery: String) {
-        _uiState.update {
+        _filterState.update {
             it.copy(searchQuery = searchQuery)
         }
     }
 
     fun updateSortOption(sortOption: SortOption) {
-        _uiState.update {
+        _filterState.update {
             it.copy(sortOption = sortOption)
         }
     }
 
-    fun updateShowSortDropDown(showDropDown: Boolean){
+    fun updateShowSortDropDown(showDropDown: Boolean) {
         _uiState.update {
             it.copy(showSortDropDown = showDropDown)
         }
@@ -240,12 +234,12 @@ data class TasksListUiState(
     val taskToDeleteId: Long = -1L,
     val searchQuery: String = "",
     val sortOption: SortOption = SortOption.NEWEST_FIRST,
-    val showSortDropDown : Boolean = false
+    val showSortDropDown: Boolean = false
 )
 
-sealed class TasksListUiEvent() {
+sealed class TasksListUiEvent {
     data class NavigateToEditTask(val taskId: Long) : TasksListUiEvent()
-    object NavigateToCreateTask : TasksListUiEvent()
+    data object NavigateToCreateTask : TasksListUiEvent()
     data class Error(val message: String) : TasksListUiEvent()
     data class Success(val message: String) : TasksListUiEvent()
 }
@@ -258,4 +252,9 @@ enum class SortOption(val text: String) {
     SATIS_PER_HIGH_TO_LOW("Satisfy Desc"),
     SATIS_PER_LOW_TO_HIGH("Satisfy Asc")
 }
+
+data class FilterState(
+    val searchQuery: String = "",
+    val sortOption: SortOption = SortOption.NEWEST_FIRST
+)
 
