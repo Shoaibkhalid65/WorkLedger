@@ -1,6 +1,5 @@
 package com.example.progresstracker.ui.dailyTask.tasksList
 
-import android.os.SystemClock
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.progresstracker.data.repository.DailyTaskRepository
@@ -18,8 +17,10 @@ import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.time.temporal.TemporalAdjusters
 import java.util.Locale
 import javax.inject.Inject
+import kotlin.math.abs
 
 @HiltViewModel
 class TasksListViewModel @Inject constructor(
@@ -50,7 +51,8 @@ class TasksListViewModel @Inject constructor(
                         tasks = filteredTasks,
                         isLoading = false,
                         searchQuery = _filterState.value.searchQuery,
-                        sortOption = _filterState.value.sortOption
+                        sortOption = _filterState.value.sortOption,
+                        selectionOption = _filterState.value.selectionOption
                     )
                 }
             }
@@ -63,6 +65,36 @@ class TasksListViewModel @Inject constructor(
         filterState: FilterState
     ): List<DailyTask> {
         var filteredTasks = tasks
+        val currentDateTime = getDateTimeFromMillis(System.currentTimeMillis())
+        val currentYear = currentDateTime.year
+        val currentMonth = currentDateTime.monthValue
+        val currentDayOfMonth = currentDateTime.dayOfMonth
+        val currentDayOfWeek = currentDateTime.dayOfWeek
+
+
+
+        filteredTasks = when (filterState.selectionOption) {
+            SelectionOption.ALL -> filteredTasks
+            SelectionOption.THIS_YEAR -> filteredTasks.filter { getDateTimeFromMillis(it.englishDate).year == currentYear }
+            SelectionOption.THIS_MONTH -> filteredTasks.filter {
+                getDateTimeFromMillis(it.englishDate).let { dt->
+                    dt.year == currentYear && dt.monthValue == currentMonth
+                }
+            }
+
+            SelectionOption.TODAY -> filteredTasks.filter {
+                getDateTimeFromMillis(it.englishDate).let { dt ->
+                    dt.year == currentYear
+                            && dt.monthValue == currentMonth
+                            && dt.dayOfMonth == currentDayOfMonth
+                }
+            }
+
+            SelectionOption.THIS_WEEK -> filteredTasks.filter {
+                isInThisWeek(currentDateTime,getDateTimeFromMillis(it.englishDate))
+            }
+        }
+
 
         if (filterState.searchQuery.isNotBlank()) {
             filteredTasks = filteredTasks.filter {
@@ -81,6 +113,24 @@ class TasksListViewModel @Inject constructor(
         }
 
         return filteredTasks
+    }
+
+    private fun isInThisWeek(currentDateTime: LocalDateTime, taskDateTime: LocalDateTime): Boolean {
+        val today = currentDateTime.toLocalDate()
+        val taskDate = taskDateTime.toLocalDate()
+
+        val weekStart = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+        val weekEnd = weekStart.plusDays(6)
+
+        return taskDate in weekStart .. weekEnd
+    }
+
+    private fun getDateTimeFromMillis(millis: Long): LocalDateTime {
+        val localDateTime = LocalDateTime.ofInstant(
+            Instant.ofEpochMilli(millis),
+            ZoneId.systemDefault()
+        )
+        return localDateTime
     }
 
 
@@ -155,20 +205,6 @@ class TasksListViewModel @Inject constructor(
         }
     }
 
-    fun millisToFormattedTime(millis: Long): String {
-        val localDateTime = LocalDateTime.ofInstant(
-            Instant.ofEpochMilli(millis),
-            ZoneId.systemDefault()
-        )
-
-        return String.format(
-            Locale.getDefault(),
-            "%02d:%02d",
-            localDateTime.hour,
-            localDateTime.minute
-        )
-    }
-
 
     fun millisToFormattedDuration(millis: Long): String {
         val localDateTime = LocalDateTime.ofInstant(
@@ -213,6 +249,12 @@ class TasksListViewModel @Inject constructor(
         }
     }
 
+    fun updateSelectionOption(selectionOption: SelectionOption) {
+        _filterState.update {
+            it.copy(selectionOption = selectionOption)
+        }
+    }
+
     fun formatedDate(epochMillis: Long, isOnlyDateRequired: Boolean = false): String {
         val instant = Instant.ofEpochMilli(epochMillis)
         val localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
@@ -234,7 +276,8 @@ data class TasksListUiState(
     val taskToDeleteId: Long = -1L,
     val searchQuery: String = "",
     val sortOption: SortOption = SortOption.NEWEST_FIRST,
-    val showSortDropDown: Boolean = false
+    val showSortDropDown: Boolean = false,
+    val selectionOption: SelectionOption = SelectionOption.ALL
 )
 
 sealed class TasksListUiEvent {
@@ -255,6 +298,15 @@ enum class SortOption(val text: String) {
 
 data class FilterState(
     val searchQuery: String = "",
-    val sortOption: SortOption = SortOption.NEWEST_FIRST
+    val sortOption: SortOption = SortOption.NEWEST_FIRST,
+    val selectionOption: SelectionOption = SelectionOption.ALL
 )
+
+enum class SelectionOption(val text: String) {
+    ALL("All"),
+    THIS_YEAR("This Year"),
+    THIS_MONTH("This Month"),
+    THIS_WEEK("This Week"),
+    TODAY("Today")
+}
 

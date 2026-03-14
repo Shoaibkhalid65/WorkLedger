@@ -49,8 +49,8 @@ class GoalRepository @Inject constructor(
         }
     }
 
-    suspend fun getGoalById(goalId: Long): Flow<Goal> {
-        return goalDao.getGoalById(goalId)
+    fun getGoalById(goalId: Long): Flow<Goal> {
+        return goalDao.getGoalById(goalId).map { it.toModel() }
     }
 
 

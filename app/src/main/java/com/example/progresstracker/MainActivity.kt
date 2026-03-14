@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -46,7 +47,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun AppCustomBottomBar(navHostController: NavHostController) {
-    var selectedIndex by retain { mutableIntStateOf(0) }
+    var selectedIndex by remember { mutableIntStateOf(0) }
     Row(
         modifier = Modifier
             .fillMaxWidth()

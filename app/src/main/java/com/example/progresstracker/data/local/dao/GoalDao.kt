@@ -21,7 +21,7 @@ interface GoalDao {
     suspend fun deleteAllGoals(): Int
 
     @Query("Select * from goals where id=:goalId")
-    fun getGoalById(goalId: Long): Flow<Goal>
+    fun getGoalById(goalId: Long): Flow<GoalEntity>
 
     @Query("SELECT * FROM goals ORDER BY createdAt DESC")
     fun getAllGoals(): Flow<List<GoalEntity>>
