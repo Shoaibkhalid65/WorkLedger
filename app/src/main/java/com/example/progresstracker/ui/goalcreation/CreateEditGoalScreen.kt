@@ -33,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -44,11 +45,11 @@ import com.example.progresstracker.navigation.Screen
 import com.example.progresstracker.utils.DateTimeUtils
 import kotlinx.coroutines.launch
 
-
+@Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateEditGoalScreen(
-    navHostController: NavHostController,
+    navHostController: NavHostController?=null,
     outerPadding: PaddingValues = PaddingValues(),
     createEditGoalViewModel: CreateEditGoalViewModel = hiltViewModel(),
 ) {
@@ -64,7 +65,7 @@ fun CreateEditGoalScreen(
                 }
 
                 CreateEditGoalUiEvent.NavigateToListScreen -> {
-                    navHostController.navigate(Screen.GoalScreen.route) {
+                    navHostController?.navigate(Screen.GoalScreen.route) {
                         popUpTo(Screen.CreateEditGoalScreen.route) {
                             inclusive = true
                         }
