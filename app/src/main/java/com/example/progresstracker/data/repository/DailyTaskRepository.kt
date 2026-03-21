@@ -49,10 +49,11 @@ class DailyTaskRepository @Inject constructor(
                         englishDate = 0L
                     ).toEntity()
                 )
-
-                id =
-                    taskDurationDao.upsertTaskDuration(taskDuration.toEntity(getMaxTaskId().first()))
             }
+
+            id =
+                taskDurationDao.upsertTaskDuration(taskDuration.toEntity(getMaxTaskId().first()))
+
             if (id == -1L) {
                 Result.failure(Throwable("Duration not created"))
             } else {
