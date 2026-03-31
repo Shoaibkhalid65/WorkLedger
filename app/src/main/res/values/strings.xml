@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Progress Tracker</string>
+    <string name="notification_channel_name">Duration Channel</string>
+    <string name="notification_channel_desc">Duration Channel Description</string>
 </resources>
