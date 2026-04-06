@@ -3,18 +3,23 @@ package com.example.progresstracker.ui.gaols
 import android.content.Context
 import android.widget.Toast
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.tween import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -38,6 +43,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LoadingIndicator
@@ -48,6 +54,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -61,19 +69,25 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.example.progresstracker.model.Goal
+import com.example.progresstracker.model.GoalBadgeColor
+import com.example.progresstracker.model.badgeColor
+import com.example.progresstracker.model.toLabel
 import com.example.progresstracker.navigation.Screen
+import com.example.progresstracker.ui.components.GoalBadge
 import com.example.progresstracker.utils.DateTimeUtils
 import kotlinx.coroutines.launch
 
@@ -217,7 +231,9 @@ fun GoalsListScreen(
                 } else {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)
+                        contentPadding = PaddingValues(top = 12.dp, start = 12.dp, end = 12.dp, bottom = 80.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         item {
                             Row(
@@ -348,14 +364,8 @@ fun GoalsListScreen(
             goalsListViewModel.deleteAllGoals()
         }
     }
-
 }
 
-fun showToast(context: Context, message: String) {
-    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-}
-
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun GoalItem(
     goal: Goal,
@@ -365,128 +375,186 @@ fun GoalItem(
     onToggleChanged: (Boolean) -> Unit,
     formatedDate: (Long, Boolean) -> String
 ) {
-    val containerColor = if (goal.isCompleted) Color.Green else Color.Red
+    // Left border color: green for completed, amber for pending
+    val accentColor = if (isCompleted) Color(0xFF3B6D11) else Color(0xFFBA7517)
+
     Card(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(12.dp),
-        shape = RoundedCornerShape(12.dp),
+            .fillMaxWidth(),
+        shape = RoundedCornerShape(
+            topStart = 0.dp, bottomStart = 0.dp,
+            topEnd = 12.dp, bottomEnd = 12.dp
+        ),
         colors = CardDefaults.cardColors(
-            containerColor = containerColor.copy(0.3f)
-        )
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant)
     ) {
-        Column(
-            modifier = Modifier.wrapContentSize(),
-            verticalArrangement = Arrangement.spacedBy(
-                4.dp,
-                Alignment.CenterVertically
-            ),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = goal.title,
-                style = MaterialTheme.typography.titleSmall
+        // Colored left accent bar
+        Row(modifier = Modifier.fillMaxWidth()) {
+            Box(
+                modifier = Modifier
+                    .width(3.dp)
+                    .fillMaxHeight()
+                    .background(accentColor)
             )
-            Text(
-                text = goal.description,
-                style = MaterialTheme.typography.bodyMedium
-            )
-            if (goal.isCompleted) {
+
+            Column(
+                modifier = Modifier
+                    .padding(horizontal = 14.dp, vertical = 12.dp)
+                    .fillMaxWidth()
+            ) {
+
+                // ── Top row: status badge + action icons ──────────────
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    GoalBadge(
+                        label = if (isCompleted) "Completed" else "Pending",
+                        color = if (isCompleted) GoalBadgeColor.GREEN else GoalBadgeColor.AMBER
+                    )
+
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        IconButton(
+                            onClick = onEditGoal,
+                            modifier = Modifier
+                                .border(
+                                    0.5.dp,
+                                    MaterialTheme.colorScheme.outlineVariant,
+                                    RoundedCornerShape(8.dp)
+                                )
+                                .size(32.dp),
+                            shape = RoundedCornerShape(8.dp),
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = "Edit goal",
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                        IconButton(
+                            onClick = onDeleteGoal,
+                            modifier = Modifier
+                                .border(
+                                    0.5.dp,
+                                    MaterialTheme.colorScheme.outlineVariant,
+                                    RoundedCornerShape(8.dp)
+                                )
+                                .size(32.dp),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Delete goal",
+                                modifier = Modifier.size(16.dp),
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    }
+                }
+
+                Spacer(Modifier.height(8.dp))
+
+                // ── Title + description ───────────────────────────────
                 Text(
-                    text = "Completion date : ${formatedDate(goal.completionDate, true)}"
+                    text = goal.title,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
-            } else if (goal.expectedCompletionDate != 0L) {
-                Text(
-                    text = "Expected Completion date : ${
-                        formatedDate(
-                            goal.expectedCompletionDate,
-                            true
+
+                if (goal.description.isNotBlank()) {
+                    Spacer(Modifier.height(3.dp))
+                    Text(
+                        text = goal.description,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+
+                Spacer(Modifier.height(10.dp))
+
+                // ── Priority badges ───────────────────────────────────
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    GoalBadge(
+                        label = goal.difficultyLevel.toLabel(),
+                        color = goal.difficultyLevel.badgeColor()
+                    )
+                    GoalBadge(
+                        label = goal.importanceLevel.toLabel(),
+                        color = goal.importanceLevel.badgeColor()
+                    )
+                    GoalBadge(
+                        label = goal.urgencyLevel.toLabel(),
+                        color = goal.urgencyLevel.badgeColor()
+                    )
+                }
+
+                Spacer(Modifier.height(10.dp))
+
+                // ── Date chip ─────────────────────────────────────────
+                val dateLabel = when {
+                    isCompleted && goal.completionDate != 0L ->
+                        "Completed ${formatedDate(goal.completionDate, true)}"
+                    goal.expectedCompletionDate != 0L ->
+                        "Due ${formatedDate(goal.expectedCompletionDate, true)}"
+                    else -> null
+                }
+
+                dateLabel?.let {
+                    Surface(
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        shape = RoundedCornerShape(6.dp)
+                    ) {
+                        Text(
+                            text = it,
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
                         )
-                    }"
+                    }
+                }
+
+                // ── Divider ───────────────────────────────────────────
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 10.dp),
+                    thickness = 0.5.dp,
+                    color = MaterialTheme.colorScheme.outlineVariant
                 )
-            }
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Column {
-                    Text(
-                        text = "Difficulty"
-                    )
-                    PriorityGraph(goal.difficultyLevel.ordinal, goal.difficultyLevel.name)
-                }
-                Column {
-                    Text(
-                        text = "Importance"
-                    )
-                    PriorityGraph(goal.importanceLevel.ordinal, goal.importanceLevel.name)
-                }
-                Column {
-                    Text(
-                        text = "Urgency"
-                    )
-                    PriorityGraph(goal.urgencyLevel.ordinal, goal.urgencyLevel.name)
-                }
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceAround,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(
-                    onClick = {
-                        onEditGoal()
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = "delete goal"
-                    )
-                }
-
-                IconButton(
-                    onClick = {
-                        onDeleteGoal()
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "delete goal"
-                    )
-                }
-
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                ToggleButton(
-                    checked = isCompleted,
-                    onCheckedChange = {
-                        onToggleChanged(it)
-                    }
+                // ── Bottom row: created date + toggle ─────────────────
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Is Goal Completed ?"
+                        text = "Created ${formatedDate(goal.createdAt, true)}",
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Text(
+                            text = "Mark complete",
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Switch(
+                            checked = isCompleted,
+                            onCheckedChange = onToggleChanged,
+                            modifier = Modifier.scale(0.75f)  // compact size
+                        )
+                    }
                 }
-
             }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
-            ) {
-                Text(
-                    text = formatedDate(goal.createdAt, false)
-                )
-            }
-
-
         }
     }
 }
