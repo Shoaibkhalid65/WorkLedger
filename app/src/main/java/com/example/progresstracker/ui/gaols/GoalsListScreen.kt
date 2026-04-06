@@ -9,6 +9,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -391,14 +392,13 @@ fun GoalItem(
         border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant)
     ) {
         // Colored left accent bar
-        Row(modifier = Modifier.fillMaxWidth()) {
+        Row(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
             Box(
                 modifier = Modifier
-                    .width(3.dp)
                     .fillMaxHeight()
+                    .width(3.dp)
                     .background(accentColor)
             )
-
             Column(
                 modifier = Modifier
                     .padding(horizontal = 14.dp, vertical = 12.dp)
@@ -559,32 +559,6 @@ fun GoalItem(
     }
 }
 
-@Composable
-fun PriorityGraph(ordinal: Int, name: String) {
-    val data = when (ordinal) {
-        0 -> PriorityGraphData(Color.Red, 0.0f)
-        1 -> PriorityGraphData(Color.Yellow, 0.33f)
-        2 -> PriorityGraphData(Color.Green, 0.66f)
-        else -> PriorityGraphData(Color.Transparent, 0.99f)
-    }
-
-    Column {
-        Box(
-            modifier = Modifier
-                .size(width = 30.dp, height = 80.dp)
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(Color.Transparent, data.color),
-                        startY = data.startY
-                    ),
-                    shape = RoundedCornerShape(2.dp)
-                )
-        )
-        Text(
-            text = name
-        )
-    }
-}
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -667,8 +641,3 @@ fun GoalsSortDropDown(
     }
 }
 
-
-data class PriorityGraphData(
-    val color: Color,
-    val startY: Float
-)
