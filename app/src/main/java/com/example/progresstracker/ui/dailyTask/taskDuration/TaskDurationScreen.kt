@@ -299,7 +299,7 @@ fun DurationCreationDialog(
         composition = composition,
         iterations = LottieConstants.IterateForever,
         isPlaying = isTracking,
-        speed = 0.2f
+        speed = 0.165f
     )
 
     ModalBottomSheet(
