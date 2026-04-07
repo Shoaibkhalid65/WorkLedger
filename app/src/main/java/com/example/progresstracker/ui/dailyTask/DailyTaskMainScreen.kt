@@ -11,12 +11,13 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.PrimaryScrollableTabRow
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -31,6 +32,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -47,17 +49,14 @@ fun DailyTaskMainScreen(
     tasksListViewModel: TasksListViewModel = hiltViewModel(),
     taskDurationViewModel: TaskDurationViewModel = hiltViewModel()
 ) {
-    val titles = listOf("tasks", "durations")
+    val titles = listOf("Tasks", "Durations")
     val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState { titles.size }
     val snackbarHostState = remember { SnackbarHostState() }
 
     val isTasksScreen = pagerState.currentPage == 0
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-
     val density = LocalDensity.current
     val fabOffsetPx = with(density) { 45.dp.toPx() }
-    val snackbarOffset = with(density) { 80.dp.toPx() }
 
     val fabOffset by animateFloatAsState(
         targetValue = if (snackbarHostState.currentSnackbarData == null) 0f else -fabOffsetPx,
@@ -70,81 +69,80 @@ fun DailyTaskMainScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Crossfade(targetState = isTasksScreen) { isTasks ->
+                    Crossfade(targetState = isTasksScreen, label = "title") { isTasks ->
                         Text(
-                            text = if (isTasks) "My Tasks" else "My Durations"
+                            text = if (isTasks) "My Tasks" else "My Durations",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.SemiBold
                         )
                     }
                 },
                 actions = {
                     IconButton(
                         onClick = {
-                            if (isTasksScreen) {
-                                tasksListViewModel.updateShowDeleteAllDialog(true)
-                            } else {
-                                taskDurationViewModel.updateShowAllDeletionDialog(true)
-                            }
+                            if (isTasksScreen) tasksListViewModel.updateShowDeleteAllDialog(true)
+                            else taskDurationViewModel.updateShowAllDeletionDialog(true)
                         }
-                    ) { Icon(Icons.Default.Delete, null) }
+                    ) {
+                        Icon(
+                            Icons.Default.DeleteSweep,
+                            contentDescription = "Delete all",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 },
-                windowInsets = WindowInsets(),
-                scrollBehavior = scrollBehavior
+                windowInsets = WindowInsets(0),
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                )
             )
         },
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = {
-                    if (isTasksScreen) {
-                        tasksListViewModel.onCreateTaskClick()
-                    } else {
-                        taskDurationViewModel.updateShowCreationDialog(true)
-                    }
+                    if (isTasksScreen) tasksListViewModel.onCreateTaskClick()
+                    else taskDurationViewModel.updateShowCreationDialog(true)
                 },
-                icon = {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = null
-                    )
-                },
+                icon = { Icon(Icons.Default.Add, contentDescription = null) },
                 text = {
-                    Crossfade(targetState = isTasksScreen, label = "fab text") { isTasksScreen ->
+                    Crossfade(targetState = isTasksScreen, label = "fab text") { isTasks ->
                         Text(
-                            text = if (isTasksScreen) "Add Task     " else "Add Duration"
+                            text = if (isTasks) "New Task" else "Track Duration",
+                            fontWeight = FontWeight.Medium
                         )
                     }
                 },
+                modifier = Modifier.graphicsLayer { translationY = fabOffset },
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            )
+        },
+        contentWindowInsets = WindowInsets(0),
+        snackbarHost = {
+            SnackbarHost(
+                snackbarHostState,
                 modifier = Modifier.graphicsLayer {
-                    translationY = fabOffset
+                    translationY = with(density) { 80.dp.toPx() }
                 }
             )
         },
-        contentWindowInsets = WindowInsets(),
-        snackbarHost = {
-            SnackbarHost(
-                snackbarHostState, modifier = Modifier.graphicsLayer {
-                    translationY = snackbarOffset
-                }
-            )
-        }
-
+        containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
-        Column(modifier = Modifier.padding(innerPadding)) {
-            PrimaryScrollableTabRow(
-                selectedTabIndex = pagerState.currentPage
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+        ) {
+            // Use PrimaryTabRow (fixed, not scrollable) to match GoalsListScreen
+            PrimaryTabRow(
+                selectedTabIndex = pagerState.currentPage,
+                containerColor = MaterialTheme.colorScheme.surface
             ) {
-                titles.forEachIndexed { index, string ->
+                titles.forEachIndexed { index, title ->
                     Tab(
                         selected = pagerState.currentPage == index,
-                        onClick = {
-                            scope.launch {
-                                pagerState.animateScrollToPage(index)
-                            }
-                        },
-                        text = {
-                            Text(
-                                text = string
-                            )
-                        }
+                        onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
+                        text = { Text(title, fontWeight = FontWeight.Medium) }
                     )
                 }
             }

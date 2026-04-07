@@ -44,6 +44,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -211,7 +212,7 @@ fun GoalsListScreen(
             HorizontalPager(state = pagerState) { pageIndex ->
                 if (uiState.isLoading) {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator()
+                        CircularWavyProgressIndicator()
                     }
                 } else {
                     val goals = when (pageIndex) {
@@ -685,7 +686,7 @@ fun GoalsSortDropDown(
     onDismiss: () -> Unit,
     onSortOptionUpdated: (GoalSortOption) -> Unit
 ) {
-    DropdownMenu(expanded = showDropDown, onDismissRequest = onDismiss) {
+    DropdownMenu(expanded = showDropDown, onDismissRequest = onDismiss,shape = RoundedCornerShape(14.dp)) {
         GoalSortOption.entries.forEach { option ->
             val isSelected = sortOption == option
             DropdownMenuItem(
