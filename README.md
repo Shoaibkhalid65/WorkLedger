@@ -16,8 +16,6 @@
 
 ## Video Demo
 
-> 📹 *[Click here to watch the full app demo](#)*  
-
 
 https://github.com/user-attachments/assets/80b39af7-7174-4934-bd32-2e41cc0507bf
 
