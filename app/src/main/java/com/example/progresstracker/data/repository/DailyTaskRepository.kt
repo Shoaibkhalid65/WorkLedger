@@ -1,6 +1,5 @@
 package com.example.progresstracker.data.repository
 
-import com.example.progresstracker.data.local.datastore.StartTimePreferencesManager
 import com.example.progresstracker.data.local.db.dao.DailyTaskDao
 import com.example.progresstracker.data.local.db.dao.TaskDurationDao
 import com.example.progresstracker.data.mapper.toEntity
@@ -27,7 +26,6 @@ class DailyTaskRepository @Inject constructor(
     private val taskDurationDao: TaskDurationDao,
     @param:ApplicationScope private val scope: CoroutineScope,
     @param:DefaultDispatcher private val dispatcher: CoroutineDispatcher,
-    private val saveStartTimePreferencesManager: StartTimePreferencesManager
 ) {
 
 
@@ -112,14 +110,6 @@ class DailyTaskRepository @Inject constructor(
         }
     }
 
-    suspend fun createOrEditStartTime(startTime: Long) {
-        saveStartTimePreferencesManager.writeStartTime(startTime)
-    }
-
-    fun observeStartTime(): Flow<Long> {
-        return saveStartTimePreferencesManager.readStartTime()
-    }
-
 
     //    daily task methods
 
@@ -202,9 +192,5 @@ class DailyTaskRepository @Inject constructor(
     fun getMaxTaskId(): Flow<Long> {
         return dailyTaskDao.getMaxId()
     }
-
-//    fun observeLastTask(): DailyTask{
-//        return dailyTaskDao.getDailyTaskById(getMaxTaskId().first()).toModel()
-//    }
 
 }

@@ -4,12 +4,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,11 +26,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.progresstracker.practice.DailyTaskMainScreen2
 import com.example.progresstracker.ui.dailyTask.DailyTaskMainScreen
 import com.example.progresstracker.ui.dashboard.DashboardScreen
 import com.example.progresstracker.ui.gaols.GoalsListScreen
 import com.example.progresstracker.ui.goalcreation.CreateEditGoalScreen
+import com.example.progresstracker.ui.settings.AppearanceSettingsScreen
 import com.example.progresstracker.ui.taskcreation.CreateEditTaskScreen
 
 @Composable
@@ -44,7 +38,8 @@ fun AppNavGraph() {
     val navHostController = rememberNavController()
     val navBackStackEntry by navHostController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
-    val bottomBarRoutes = setOf(Screen.GoalScreen.route, Screen.DashboardScreen.route, Screen.DailyTaskScreen.route)
+    val bottomBarRoutes =
+        setOf(Screen.GoalScreen.route, Screen.DashboardScreen.route, Screen.DailyTaskScreen.route)
     val showBottomBar = currentRoute in bottomBarRoutes
 
     Scaffold(
@@ -54,8 +49,6 @@ fun AppNavGraph() {
                     visible = showBottomBar,
                     enter = EnterTransition.None,
                     exit = ExitTransition.None
-//                    enter = slideInVertically { it } + expandVertically() + fadeIn(),
-//                    exit = slideOutVertically { it } + shrinkVertically() + fadeOut()
                 ) {
                     AppBottomBar(navHostController, currentRoute)
                 }
@@ -105,7 +98,11 @@ fun AppNavGraph() {
             }
 
             composable(Screen.DashboardScreen.route) {
-                DashboardScreen()
+                DashboardScreen(navController = navHostController)
+            }
+
+            composable(Screen.AppearanceSettingsScreen.route) {
+                AppearanceSettingsScreen(navController = navHostController)
             }
         }
     }

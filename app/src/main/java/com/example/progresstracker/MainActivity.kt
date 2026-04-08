@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -29,25 +30,36 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.example.progresstracker.navigation.AppNavGraph
 import com.example.progresstracker.navigation.BottomBarDestination
+import com.example.progresstracker.ui.settings.AppPreferencesViewModel
 import com.example.progresstracker.ui.theme.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    private val prefViewModel: AppPreferencesViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        if(Build.VERSION.SDK_INT>= Build.VERSION_CODES.TIRAMISU){
-            requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS),101)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 101)
         }
 
         setContent {
-            AppTheme {
+            val uiState by prefViewModel.uiState.collectAsStateWithLifecycle()
+            AppTheme(
+                colorScheme = uiState.colorScheme,
+                themeMode = uiState.themeMode,
+                useDynamicColor = uiState.useDynamicColor
+            ) {
                 AppNavGraph()
             }
         }

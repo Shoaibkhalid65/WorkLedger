@@ -36,16 +36,21 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.airbnb.lottie.LottieProperty
+import com.airbnb.lottie.SimpleColorFilter
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
+import com.airbnb.lottie.compose.rememberLottieDynamicProperties
+import com.airbnb.lottie.compose.rememberLottieDynamicProperty
 import com.example.progresstracker.R
 import com.example.progresstracker.utils.DateTimeUtils
 
@@ -301,6 +306,13 @@ fun DurationCreationDialog(
         isPlaying = isTracking,
         speed = 0.165f
     )
+    val dynamicProperties = rememberLottieDynamicProperties(
+        rememberLottieDynamicProperty(
+            property = LottieProperty.COLOR_FILTER,
+            value = SimpleColorFilter(MaterialTheme.colorScheme.primary.toArgb()),
+            keyPath = arrayOf("**")
+        )
+    )
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -379,7 +391,8 @@ fun DurationCreationDialog(
                 LottieAnimation(
                     composition = composition,
                     progress = { progress },
-                    modifier = Modifier.size(160.dp)
+                    modifier = Modifier.size(160.dp),
+                    dynamicProperties = dynamicProperties
                 )
 
                 Surface(
