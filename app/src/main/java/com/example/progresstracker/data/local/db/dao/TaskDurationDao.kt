@@ -54,4 +54,7 @@ interface TaskDurationDao {
 """)
     suspend fun getTodayDurationTotal(todayEpoch: Long): DailyDurationTotal?
 
+    @Query("SELECT COUNT(*) FROM task_durations WHERE dateEpoch = :todayEpoch")
+    suspend fun getSessionCountForDay(todayEpoch: Long): Int
+
 }

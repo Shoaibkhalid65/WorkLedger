@@ -23,7 +23,6 @@ class DashboardRepository @Inject constructor(
     fun observeDailySatisfactionAverages(): Flow<List<DailySatisfactionAvg>> =
         dailyTaskDao.getDailySatisfactionAverage()
 
-    // Combines both flows into a single TodaySummary for the top cards
     fun observeTodaySummary(): Flow<TodaySummary> {
         val todayEpoch = DateTimeUtils.toMidnightEpoch(System.currentTimeMillis())
         return combine(
@@ -32,9 +31,10 @@ class DashboardRepository @Inject constructor(
         ) { durations, satisfaction ->
             val todayDuration = durations.firstOrNull { it.dateEpoch == todayEpoch }
             val todaySatisfaction = satisfaction.firstOrNull { it.dateEpoch == todayEpoch }
+            val sessionCount = taskDurationDao.getSessionCountForDay(todayEpoch)
             TodaySummary(
                 totalHours = (todayDuration?.totalMillis ?: 0L) / 3_600_000f,
-                tasksDone = durations.count { it.dateEpoch == todayEpoch },
+                tasksDone = sessionCount,  // ← actual session count now
                 avgSatisfaction = todaySatisfaction?.avgPercent ?: 0f
             )
         }
