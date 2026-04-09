@@ -140,6 +140,7 @@ class CreateEditTaskViewModel @Inject constructor(
 
 data class CreateEditTaskUiState(
     val id: Long? = null,
+    val englishDate : Long =0L,
     val title: String = "",
     val description: String = "",
     val remarks: String = "",
@@ -173,6 +174,7 @@ fun TaskDuration.toUIState() = TaskDurationUiState(
 
 fun DailyTask.toUiState() = CreateEditTaskUiState(
     id = id,
+    englishDate=englishDate,
     title = title,
     description = description,
     remarks = remarks,
@@ -187,7 +189,7 @@ fun CreateEditTaskUiState.toModel() = DailyTask(
     description = description,
     remarks = remarks,
     satisfyPercentage = satisfyPercentage,
-    englishDate = System.currentTimeMillis(),
+    englishDate = if(englishDate!=0L) englishDate else System.currentTimeMillis(),
     durations = if (taskDurations.isNotEmpty()) taskDurations.map { it.toModel() } else emptyList()
 )
 
