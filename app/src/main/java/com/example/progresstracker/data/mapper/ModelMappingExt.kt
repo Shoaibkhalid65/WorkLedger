@@ -1,6 +1,5 @@
 package com.example.progresstracker.data.mapper
 
-import android.webkit.JavascriptInterface
 import com.example.progresstracker.data.local.db.entity.DailyTaskEntity
 import com.example.progresstracker.data.local.db.entity.GoalEntity
 import com.example.progresstracker.data.local.db.entity.TaskDurationEntity
@@ -35,9 +34,6 @@ fun DailyTaskEntity.toModel(durations: List<TaskDurationEntity>): DailyTask = Da
     durations = durations.map { it.toModel() }
 )
 
-//fun List<DailyTaskEntity>.toModel(durations: List<TaskDurationEntity>)= map {
-//    it.toModel(durations)
-//}
 
 fun DailyTask.toEntity() = DailyTaskEntity(
     id = id,
@@ -99,7 +95,7 @@ fun GoalEntity.toModel() = Goal(
         else -> DifficultyLevel.EASY
     },
     importanceLevel = when (importanceLevel.uppercase()) {
-        "VERY_IMPORTANT" -> ImportanceLevel.VERY_IMP
+        "VERY_IMP" -> ImportanceLevel.VERY_IMP
         "IMPORTANT" -> ImportanceLevel.IMPORTANT
         "AVERAGE" -> ImportanceLevel.AVERAGE
         else -> ImportanceLevel.AVERAGE
@@ -107,7 +103,7 @@ fun GoalEntity.toModel() = Goal(
     urgencyLevel = when (urgencyLevel.uppercase()) {
         "URGENT" -> UrgencyLevel.URGENT
         "AVERAGE" -> UrgencyLevel.AVERAGE
-        "NOT_URGENT" -> UrgencyLevel.NOT_URG
+        "NOT_URG" -> UrgencyLevel.NOT_URG
         else -> UrgencyLevel.NOT_URG
     }
 )
