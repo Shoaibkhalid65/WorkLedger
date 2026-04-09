@@ -13,6 +13,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
@@ -118,12 +119,15 @@ class DailyTaskRepository @Inject constructor(
     //    daily task methods
 
     fun observeAllRealTasks(): Flow<List<DailyTask>> {
-        return dailyTaskDao.getRealDailyTasks().map { dailyTasks ->
-            dailyTasks.map { dailyTaskEntity ->
-                val durations = taskDurationDao.getAllDurationsByTaskId(dailyTaskEntity.id).first()
-                dailyTaskEntity.toModel(durations)
+        return combine(
+            dailyTaskDao.getRealDailyTasks(),
+            taskDurationDao.getAllDurationsForRealTasks()
+        ) { tasks, durations ->
+            val durationsByTaskId = durations.groupBy { it.dailyTaskId }
+            tasks.map { taskEntity ->
+                taskEntity.toModel(durationsByTaskId[taskEntity.id] ?: emptyList())
             }
-        }
+        }.flowOn(dispatcher)
     }
 
     suspend fun getDailyTaskById(taskId: Long): DailyTask? {

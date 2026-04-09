@@ -57,4 +57,12 @@ interface TaskDurationDao {
     @Query("SELECT COUNT(*) FROM task_durations WHERE dateEpoch = :todayEpoch")
     suspend fun getSessionCountForDay(todayEpoch: Long): Int
 
+    @Query("""
+    SELECT td.* FROM task_durations td
+    INNER JOIN daily_tasks dt ON td.dailyTaskId = dt.id
+    WHERE dt.englishDate != 0
+    ORDER BY td.dailyTaskId
+""")
+    fun getAllDurationsForRealTasks(): Flow<List<TaskDurationEntity>>
+
 }
