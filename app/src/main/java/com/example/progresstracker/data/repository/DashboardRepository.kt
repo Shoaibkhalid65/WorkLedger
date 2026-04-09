@@ -33,7 +33,7 @@ class DashboardRepository @Inject constructor(
             val todaySatisfaction = satisfaction.firstOrNull { it.dateEpoch == todayEpoch }
             val sessionCount = taskDurationDao.getSessionCountForDay(todayEpoch)
             TodaySummary(
-                totalHours = (todayDuration?.totalMillis ?: 0L) / 3_600_000f,
+                totalHours = ((todayDuration?.totalMillis ?: 0L) / 3_600_000f).coerceAtLeast(0f),
                 tasksDone = sessionCount,  // ← actual session count now
                 avgSatisfaction = todaySatisfaction?.avgPercent ?: 0f
             )

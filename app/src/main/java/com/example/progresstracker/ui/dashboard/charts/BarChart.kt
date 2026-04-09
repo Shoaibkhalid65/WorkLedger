@@ -109,7 +109,7 @@ fun BarChart(
 
         // ── Bars ──────────────────────────────────────────────
         data.forEachIndexed { index, item ->
-            val barHeight = (item.value / maxValue) * chartHeight * animProgress.value
+            val barHeight = ((item.value / maxValue) * chartHeight * animProgress.value).coerceAtLeast(0f)
             val left = index * barAreaWidth + horizontalPadding
             val top = chartHeight - barHeight
             val color = if (index == selectedIndex) selectedBarColor else barColor

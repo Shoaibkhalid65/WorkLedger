@@ -40,7 +40,7 @@ interface TaskDurationDao {
     @Query("""
     SELECT dateEpoch, SUM(durationTime) as totalMillis
     FROM task_durations
-    WHERE dateEpoch != 0
+    WHERE dateEpoch != 0 AND durationTime > 0
     GROUP BY dateEpoch
     ORDER BY dateEpoch DESC
     LIMIT 30
@@ -50,7 +50,7 @@ interface TaskDurationDao {
     @Query("""
     SELECT dateEpoch, SUM(durationTime) as totalMillis
     FROM task_durations
-    WHERE dateEpoch = :todayEpoch
+    WHERE dateEpoch = :todayEpoch AND durationTime > 0
 """)
     suspend fun getTodayDurationTotal(todayEpoch: Long): DailyDurationTotal?
 
