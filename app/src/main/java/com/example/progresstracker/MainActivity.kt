@@ -71,7 +71,7 @@ class MainActivity : ComponentActivity() {
                     themeMode       = prefs.themeMode,
                     useDynamicColor = prefs.useDynamicColor
                 ) {
-                    AppNavGraph()
+                    AppNavGraph(showOnboarding = prefs.onboardingComplete.not())
                 }
             }
         }

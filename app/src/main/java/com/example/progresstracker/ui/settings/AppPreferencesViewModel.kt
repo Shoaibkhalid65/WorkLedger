@@ -18,7 +18,8 @@ sealed interface AppPreferencesState {
     data class Ready(
         val colorScheme: AppColorScheme,
         val themeMode: AppThemeMode,
-        val useDynamicColor: Boolean
+        val useDynamicColor: Boolean,
+        val onboardingComplete: Boolean
     ) : AppPreferencesState
 }
 
@@ -30,16 +31,18 @@ class AppPreferencesViewModel @Inject constructor(
     val uiState: StateFlow<AppPreferencesState> = combine(
         dataStore.colorScheme,
         dataStore.themeMode,
-        dataStore.useDynamicColor
-    ) { scheme, mode, dynamicColor ->
+        dataStore.useDynamicColor,
+        dataStore.onboardingComplete
+    ) { scheme, mode, dynamicColor,onboarding ->
         AppPreferencesState.Ready(
-            colorScheme     = scheme,
-            themeMode       = mode,
-            useDynamicColor = dynamicColor
+            colorScheme = scheme,
+            themeMode = mode,
+            useDynamicColor = dynamicColor,
+            onboardingComplete = onboarding
         )
     }.stateIn(
-        scope        = viewModelScope,
-        started      = SharingStarted.Eagerly,
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
         initialValue = AppPreferencesState.Loading
     )
 

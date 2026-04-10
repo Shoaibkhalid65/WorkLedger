@@ -30,11 +30,12 @@ import com.example.progresstracker.ui.dailyTask.DailyTaskMainScreen
 import com.example.progresstracker.ui.dashboard.DashboardScreen
 import com.example.progresstracker.ui.gaols.GoalsListScreen
 import com.example.progresstracker.ui.goalcreation.CreateEditGoalScreen
+import com.example.progresstracker.ui.onboarding.OnboardingScreen
 import com.example.progresstracker.ui.settings.AppearanceSettingsScreen
 import com.example.progresstracker.ui.taskcreation.CreateEditTaskScreen
 
 @Composable
-fun AppNavGraph() {
+fun AppNavGraph(showOnboarding: Boolean=false) {
     val navHostController = rememberNavController()
     val navBackStackEntry by navHostController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -60,8 +61,18 @@ fun AppNavGraph() {
                 .fillMaxSize()
                 .padding(innerPadding),
             navController = navHostController,
-            startDestination = Screen.DailyTaskScreen.route
+            startDestination = if(showOnboarding) Screen.OnboardingScreen.route else Screen.DailyTaskScreen.route
         ) {
+
+            composable(Screen.OnboardingScreen.route) {
+                OnboardingScreen(
+                    onFinished = {
+                        navHostController.navigate(Screen.DailyTaskScreen.route) {
+                            popUpTo(Screen.OnboardingScreen.route) { inclusive = true }
+                        }
+                    }
+                )
+            }
 
 
             composable(Screen.DailyTaskScreen.route) {

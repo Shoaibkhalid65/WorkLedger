@@ -1,6 +1,7 @@
 package com.example.progresstracker.navigation
 
 sealed class Screen(val route: String) {
+    object OnboardingScreen : Screen("onboarding")
     object DailyTaskScreen : Screen("daily_task")
     object GoalScreen : Screen("goal")
     object CreateEditTaskScreen : Screen("create_edit_task") {

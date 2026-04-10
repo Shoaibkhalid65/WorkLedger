@@ -22,6 +22,7 @@ class AppPreferencesDataStore @Inject constructor(
         val COLOR_SCHEME_KEY = intPreferencesKey("color_scheme")
         val THEME_MODE_KEY = intPreferencesKey("theme_mode")
         val USE_DYNAMIC_COLOR   = booleanPreferencesKey("use_dynamic_color")
+        val ONBOARDING_COMPLETE = booleanPreferencesKey("onboarding_complete")
     }
 
 
@@ -39,6 +40,10 @@ class AppPreferencesDataStore @Inject constructor(
         prefs[PreferencesKey.USE_DYNAMIC_COLOR] ?: false
     }
 
+    val onboardingComplete: Flow<Boolean> = dataStore.data.map { prefs ->
+        prefs[PreferencesKey.ONBOARDING_COMPLETE] ?: false
+    }
+
     suspend fun setColorScheme(scheme: AppColorScheme) {
         dataStore.edit { prefs ->
             prefs[PreferencesKey.COLOR_SCHEME_KEY] = scheme.ordinal
@@ -54,6 +59,12 @@ class AppPreferencesDataStore @Inject constructor(
     suspend fun setUseDynamicColor(enabled: Boolean) {
         dataStore.edit { prefs ->
             prefs[PreferencesKey.USE_DYNAMIC_COLOR] = enabled
+        }
+    }
+
+    suspend fun setOnboardingComplete() {
+        dataStore.edit { prefs ->
+            prefs[PreferencesKey.ONBOARDING_COMPLETE] = true
         }
     }
 }
