@@ -25,7 +25,7 @@ https://github.com/user-attachments/assets/80b39af7-7174-4934-bd32-2e41cc0507bf
 
 ## Overview
 
-ProgressTracker helps you answer three questions every day:
+ProgressTracker helps you answer three questions every day
 
 - **What did I work on?** — Log daily tasks with title, description, satisfaction rating, and remarks.
 - **How long did I work?** — Track live work sessions via a persistent foreground service with notification controls, or log manual durations.
