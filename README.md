@@ -1,6 +1,6 @@
 <div align="center">
 
-# ProgressTracker
+# Progressly
 
 **A modern Android productivity app for tracking daily tasks, work durations, and long-term goals — with an analytics dashboard built on top.**
 
