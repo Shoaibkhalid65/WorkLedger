@@ -189,8 +189,7 @@ fun CreateEditTaskUiState.toModel() = DailyTask(
     description = description,
     remarks = remarks,
     satisfyPercentage = satisfyPercentage,
-//    englishDate = if(englishDate!=0L) englishDate else System.currentTimeMillis(),
-    englishDate = System.currentTimeMillis(),
+    englishDate = if(englishDate!=0L) englishDate else System.currentTimeMillis(),
     durations = if (taskDurations.isNotEmpty()) taskDurations.map { it.toModel() } else emptyList()
 )
 
