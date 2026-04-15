@@ -43,7 +43,7 @@ Goals are tracked separately with a priority matrix (urgency × importance × di
 - Dual calendar display: Gregorian and Islamic (Hijri) dates
 - Filter by Today / This Week / This Month / This Year / All
 - Sort by date, work time, or satisfaction (ascending and descending)
-- Full-text search across task titles
+- Full-text search across task titles.
 
 ### Work Duration Tracking
 - **Live timer** via an Android foreground service with a persistent notification
