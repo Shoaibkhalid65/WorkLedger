@@ -1,352 +1,577 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Privacy Policy – Progressly</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
   :root {
-    --bg: #0f0f11;
-    --surface: #18181c;
-    --border: #2a2a32;
-    --accent: #7c6af7;
-    --accent-soft: #7c6af720;
-    --text-primary: #f0f0f5;
-    --text-secondary: #9898aa;
-    --text-muted: #5a5a6e;
-    --green: #4ade80;
-    --green-soft: #4ade8015;
+    --primary:               #8F4C38;
+    --on-primary:            #FFFFFF;
+    --primary-container:     #FFDBD1;
+    --on-primary-container:  #723523;
+    --secondary:             #77574E;
+    --tertiary:              #6C5D2F;
+    --tertiary-container:    #F5E1A7;
+    --on-tertiary:           #FFFFFF;
+    --background:            #FFF8F6;
+    --on-background:         #231917;
+    --surface:               #FFF8F6;
+    --on-surface:            #231917;
+    --surface-variant:       #F5DED8;
+    --on-surface-variant:    #53433F;
+    --outline:               #85736E;
+    --outline-variant:       #D8C2BC;
+    --surface-container-low: #FFF1ED;
+    --surface-container:     #FCEAE5;
+    --surface-container-high:#F7E4E0;
+    --error:                 #BA1A1A;
+    --error-container:       #FFDAD6;
   }
+
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    background: var(--bg);
-    color: var(--text-primary);
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 300;
-    line-height: 1.75;
+    background: var(--background);
+    color: var(--on-surface);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
     min-height: 100vh;
   }
 
-  /* grid background */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(var(--border) 1px, transparent 1px),
-      linear-gradient(90deg, var(--border) 1px, transparent 1px);
-    background-size: 48px 48px;
-    opacity: 0.3;
-    pointer-events: none;
-    z-index: 0;
+  /* Top App Bar — mirrors your TopAppBar */
+  .app-bar {
+    background: var(--surface);
+    border-bottom: 0.5px solid var(--outline-variant);
+    padding: 0 20px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .app-bar-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--primary-container);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .app-bar-icon svg { width: 18px; height: 18px; fill: var(--primary); }
+
+  .app-bar-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--on-surface);
+    letter-spacing: -0.01em;
+  }
+
+  .app-bar-date {
+    font-size: 11px;
+    color: var(--on-surface-variant);
+    margin-left: auto;
+    font-weight: 400;
   }
 
   .container {
-    position: relative;
-    z-index: 1;
-    max-width: 760px;
+    max-width: 700px;
     margin: 0 auto;
-    padding: 80px 32px 120px;
+    padding: 28px 16px 80px;
   }
 
-  /* header */
-  .header {
-    margin-bottom: 64px;
+  /* Hero card — DailyTaskItem style with left accent bar */
+  .hero-card {
+    background: var(--surface);
+    border: 0.5px solid var(--outline-variant);
+    border-radius: 0 16px 16px 0;
+    padding: 20px 20px 20px 24px;
+    margin-bottom: 20px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    position: relative;
+    overflow: hidden;
   }
 
-  .app-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--accent-soft);
-    border: 1px solid var(--accent);
-    border-radius: 100px;
-    padding: 6px 16px;
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--accent);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    margin-bottom: 28px;
-  }
-
-  .app-badge::before {
+  .hero-card::before {
     content: '';
-    width: 6px; height: 6px;
-    background: var(--accent);
-    border-radius: 50%;
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: var(--primary);
   }
 
-  h1 {
-    font-family: 'DM Serif Display', serif;
-    font-size: clamp(36px, 6vw, 52px);
-    font-weight: 400;
-    line-height: 1.15;
-    color: var(--text-primary);
+  .hero-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--primary-container);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .hero-icon svg { width: 24px; height: 24px; fill: var(--primary); }
+
+  .hero-text h1 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--on-surface);
+    margin-bottom: 4px;
+    letter-spacing: -0.02em;
+  }
+
+  .hero-text p {
+    font-size: 13px;
+    color: var(--on-surface-variant);
+    line-height: 1.55;
+  }
+
+  /* Summary row — like your SummaryCard row */
+  .summary-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
     margin-bottom: 20px;
   }
 
-  .meta {
-    font-size: 13px;
-    color: var(--text-muted);
+  .summary-chip {
+    background: var(--surface);
+    border: 0.5px solid var(--outline-variant);
+    border-radius: 14px;
+    padding: 12px 8px;
+    text-align: center;
+  }
+
+  .chip-value {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--primary);
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .chip-label {
+    font-size: 10px;
+    color: var(--on-surface-variant);
+    font-weight: 500;
     letter-spacing: 0.04em;
-  }
-
-  .meta span {
-    color: var(--text-secondary);
-  }
-
-  /* highlight box */
-  .highlight-box {
-    background: var(--green-soft);
-    border: 1px solid #4ade8030;
-    border-left: 3px solid var(--green);
-    border-radius: 12px;
-    padding: 24px 28px;
-    margin-bottom: 56px;
-    font-size: 15px;
-    color: var(--text-secondary);
-  }
-
-  .highlight-box strong {
-    color: var(--green);
-    font-weight: 500;
-  }
-
-  /* sections */
-  .section {
-    margin-bottom: 48px;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 48px;
-  }
-
-  .section:last-of-type {
-    border-bottom: none;
-  }
-
-  .section-number {
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--accent);
+  }
+
+  /* Section card — exactly your SectionCard composable */
+  .section-card {
+    background: var(--surface);
+    border: 0.5px solid var(--outline-variant);
+    border-radius: 16px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+
+  .section-header {
+    padding: 14px 16px 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
     margin-bottom: 10px;
   }
 
-  h2 {
-    font-family: 'DM Serif Display', serif;
-    font-size: 22px;
-    font-weight: 400;
-    color: var(--text-primary);
-    margin-bottom: 16px;
-    line-height: 1.3;
-  }
-
-  p {
-    font-size: 15px;
-    color: var(--text-secondary);
-    margin-bottom: 14px;
-  }
-
-  p:last-child { margin-bottom: 0; }
-
-  ul {
-    list-style: none;
-    margin: 14px 0;
-  }
-
-  ul li {
-    font-size: 15px;
-    color: var(--text-secondary);
-    padding: 8px 0 8px 24px;
-    position: relative;
-    border-bottom: 1px solid var(--border);
-  }
-
-  ul li:last-child { border-bottom: none; }
-
-  ul li::before {
-    content: '→';
-    position: absolute;
-    left: 0;
-    color: var(--accent);
-    font-size: 13px;
-  }
-
-  /* permission card */
-  .permission-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px 24px;
-    margin: 14px 0;
+  .section-header-icon {
+    width: 22px;
+    height: 22px;
+    background: var(--primary-container);
+    border-radius: 6px;
     display: flex;
-    flex-direction: column;
-    gap: 4px;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
   }
 
-  .permission-name {
+  .section-header-icon svg { width: 12px; height: 12px; fill: var(--primary); }
+
+  .section-title {
     font-size: 13px;
-    font-weight: 500;
-    color: var(--accent);
-    font-family: 'DM Sans', monospace;
-    letter-spacing: 0.04em;
+    font-weight: 600;
+    color: var(--on-surface);
   }
 
-  .permission-desc {
+  .section-body {
+    padding: 0 16px 16px 16px;
+  }
+
+  .section-body p {
     font-size: 14px;
-    color: var(--text-secondary);
+    color: var(--on-surface-variant);
+    line-height: 1.65;
+    margin-bottom: 10px;
   }
 
-  /* contact */
-  .contact-block {
+  .section-body p:last-child { margin-bottom: 0; }
+
+  /* List items */
+  .item-list { list-style: none; margin: 4px 0; }
+
+  .item-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 0.5px solid var(--outline-variant);
+    font-size: 14px;
+    color: var(--on-surface-variant);
+    line-height: 1.5;
+  }
+
+  .item-list li:last-child { border-bottom: none; }
+
+  .item-dot {
+    width: 5px;
+    height: 5px;
+    background: var(--primary);
+    border-radius: 50%;
+    margin-top: 7px;
+    flex-shrink: 0;
+  }
+
+  /* HorizontalDivider */
+  .divider {
+    height: 0.5px;
+    background: var(--outline-variant);
+    margin: 10px 0;
+  }
+
+  /* Permission cards — DurationCard style */
+  .permission-card {
+    background: var(--surface-container-low);
+    border: 0.5px solid var(--outline-variant);
+    border-radius: 14px;
+    padding: 14px 14px 14px 18px;
+    margin: 8px 0;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .permission-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 10px; bottom: 10px;
+    width: 3px;
+    background: var(--tertiary);
+    border-radius: 0 2px 2px 0;
+  }
+
+  .perm-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--tertiary-container);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .perm-icon svg { width: 16px; height: 16px; fill: var(--tertiary); }
+
+  .perm-info { flex: 1; }
+
+  .perm-name {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--on-surface);
+    font-family: 'Courier New', monospace;
+    background: var(--surface-container-high);
+    border: 0.5px solid var(--outline-variant);
+    border-radius: 6px;
+    padding: 2px 8px;
+    display: inline-block;
+    margin-bottom: 6px;
+    letter-spacing: 0.02em;
+  }
+
+  .perm-desc {
+    font-size: 13px;
+    color: var(--on-surface-variant);
+    line-height: 1.55;
+  }
+
+  /* GoalBadge style pill */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--primary-container);
+    color: var(--on-primary-container);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+  }
+
+  /* Contact card */
+  .contact-card {
     background: var(--surface);
-    border: 1px solid var(--border);
+    border: 0.5px solid var(--outline-variant);
     border-radius: 16px;
-    padding: 32px;
+    padding: 24px 20px;
     text-align: center;
+    margin-bottom: 10px;
   }
 
-  .contact-block p {
-    margin-bottom: 8px;
+  .contact-card p {
+    font-size: 13px;
+    color: var(--on-surface-variant);
+    margin-bottom: 16px;
+    line-height: 1.55;
   }
 
-  .contact-link {
-    color: var(--accent);
+  /* Primary Button */
+  .contact-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--primary);
+    color: var(--on-primary);
+    font-size: 14px;
+    font-weight: 600;
+    padding: 12px 22px;
+    border-radius: 14px;
     text-decoration: none;
-    font-weight: 500;
-    font-size: 15px;
-    border-bottom: 1px solid var(--accent);
-    padding-bottom: 2px;
     transition: opacity 0.2s;
   }
 
-  .contact-link:hover { opacity: 0.7; }
+  .contact-btn:hover { opacity: 0.88; }
+  .contact-btn svg { width: 16px; height: 16px; fill: var(--on-primary); }
 
-  /* footer */
   .footer {
-    margin-top: 80px;
     text-align: center;
-    font-size: 12px;
-    color: var(--text-muted);
-    letter-spacing: 0.05em;
+    font-size: 11px;
+    color: var(--outline);
+    margin-top: 28px;
+    padding-top: 16px;
+    border-top: 0.5px solid var(--outline-variant);
   }
 
-  @media (max-width: 600px) {
-    .container { padding: 48px 20px 80px; }
+  @media (max-width: 480px) {
+    .app-bar-date { display: none; }
+    .hero-text h1 { font-size: 17px; }
+    .summary-chip { padding: 10px 4px; }
+    .chip-value { font-size: 12px; }
+    .chip-label { font-size: 9px; }
   }
 </style>
 </head>
 <body>
+
+<div class="app-bar">
+  <div class="app-bar-icon">
+    <svg viewBox="0 0 24 24"><path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/></svg>
+  </div>
+  <span class="app-bar-title">Progressly</span>
+  <span class="app-bar-date">Effective April 20, 2026</span>
+</div>
+
 <div class="container">
 
-  <div class="header">
-    <div class="app-badge">Progressly</div>
-    <h1>Privacy Policy</h1>
-    <p class="meta">Effective date: <span>April 20, 2026</span> &nbsp;·&nbsp; Last updated: <span>April 20, 2026</span></p>
-  </div>
-
-  <div class="highlight-box">
-    <strong>Short version:</strong> Progressly collects zero personal data. Everything you create in the app — tasks, goals, durations — stays exclusively on your device and is never transmitted anywhere.
-  </div>
-
-  <!-- 1 -->
-  <div class="section">
-    <div class="section-number">01</div>
-    <h2>Introduction</h2>
-    <p>Progressly ("the App") is a personal productivity application developed by Muhammad Shoaib Khalid ("Developer", "we", "us"). This Privacy Policy explains how the App handles information when you use it on your Android device.</p>
-    <p>We are committed to protecting your privacy. This policy is intended to be straightforward because the App is designed with a privacy-first, offline-first architecture.</p>
-  </div>
-
-  <!-- 2 -->
-  <div class="section">
-    <div class="section-number">02</div>
-    <h2>Information We Do Not Collect</h2>
-    <p>Progressly does <strong style="color:var(--text-primary)">not</strong> collect, transmit, store remotely, or share any of the following:</p>
-    <ul>
-      <li>Personal identification information (name, email, phone number)</li>
-      <li>Account or login credentials</li>
-      <li>Location data</li>
-      <li>Device identifiers or advertising IDs</li>
-      <li>Usage analytics or crash reports sent to external servers</li>
-      <li>Any content you enter — tasks, goals, notes, or durations</li>
-    </ul>
-    <p>The App has no internet connectivity. There are no third-party analytics SDKs, advertising SDKs, or tracking libraries included in the App.</p>
-  </div>
-
-  <!-- 3 -->
-  <div class="section">
-    <div class="section-number">03</div>
-    <h2>Data Stored on Your Device</h2>
-    <p>All data you create within Progressly is stored exclusively on your local device using Android's Room (SQLite) database and Jetpack DataStore. This includes:</p>
-    <ul>
-      <li>Daily task entries (title, description, satisfaction rating, remarks)</li>
-      <li>Work session durations (start time, end time, computed duration)</li>
-      <li>Goals (title, description, priority classifications, completion status)</li>
-      <li>App appearance preferences (theme, color scheme)</li>
-    </ul>
-    <p>This data never leaves your device. It is not backed up to any server operated by us. Standard Android system backups (if enabled by you in your device settings) may include this data — this is controlled entirely by you and Android, not by the App.</p>
-  </div>
-
-  <!-- 4 -->
-  <div class="section">
-    <div class="section-number">04</div>
-    <h2>Permissions Used</h2>
-    <p>The App requests the following Android permissions, each used solely for core functionality:</p>
-
-    <div class="permission-card">
-      <div class="permission-name">POST_NOTIFICATIONS</div>
-      <div class="permission-desc">Required on Android 13+ to display the persistent foreground service notification during an active work session timer. No notifications are sent for marketing or tracking purposes.</div>
+  <!-- Hero -->
+  <div class="hero-card">
+    <div class="hero-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 1C5.9 1 1 5.9 1 12s4.9 11 11 11 11-4.9 11-11S18.1 1 12 1zm0 2c4.97 0 9 4.03 9 9s-4.03 9-9 9-9-4.03-9-9 4.03-9 9-9zm4.59 5L12 12.59 7.41 8 6 9.41l6 6 6-6L16.59 8z"/></svg>
     </div>
-
-    <div class="permission-card">
-      <div class="permission-name">FOREGROUND_SERVICE</div>
-      <div class="permission-desc">Used to run the work session timer as a foreground service, ensuring it continues accurately even when the app is backgrounded or the screen is off. The service writes session data only to the local Room database.</div>
+    <div class="hero-text">
+      <h1>Privacy Policy</h1>
+      <p>Progressly is built with a privacy-first approach. All your data stays exclusively on your device — nothing is ever collected, transmitted, or shared.</p>
     </div>
-
-    <p style="margin-top:16px">No other permissions are requested. The App does not request access to contacts, camera, microphone, storage, or location.</p>
   </div>
 
-  <!-- 5 -->
-  <div class="section">
-    <div class="section-number">05</div>
-    <h2>Third-Party Services</h2>
-    <p>Progressly does not integrate with any third-party services, APIs, or SDKs that collect data. There are no advertisements, no analytics platforms, and no external dependencies that communicate over the network.</p>
-  </div>
-
-  <!-- 6 -->
-  <div class="section">
-    <div class="section-number">06</div>
-    <h2>Children's Privacy</h2>
-    <p>Progressly is a general-purpose productivity tool not directed at children under the age of 13. We do not knowingly collect any information from children. Since the App collects no personal data from any user, no special measures for children are applicable beyond this statement.</p>
-  </div>
-
-  <!-- 7 -->
-  <div class="section">
-    <div class="section-number">07</div>
-    <h2>Data Deletion</h2>
-    <p>Because all data is stored locally on your device, you have full control over it at all times. You can delete individual tasks, durations, or goals from within the App. To remove all App data, uninstall the App from your device — this permanently erases all locally stored data.</p>
-    <p>There is no account to delete and no server-side data to request removal of.</p>
-  </div>
-
-  <!-- 8 -->
-  <div class="section">
-    <div class="section-number">08</div>
-    <h2>Changes to This Policy</h2>
-    <p>If we make material changes to this Privacy Policy, the updated policy will be published at the same URL with a revised effective date. Continued use of the App after changes are posted constitutes acceptance of the updated policy.</p>
-  </div>
-
-  <!-- 9 -->
-  <div class="section">
-    <div class="section-number">09</div>
-    <h2>Contact</h2>
-    <div class="contact-block">
-      <p>Questions about this Privacy Policy?</p>
-      <p style="margin-bottom:16px; color: var(--text-muted); font-size:14px">Reach out and we'll respond as soon as possible.</p>
-      <a href="mailto:shoaibkhalid.dev@gmail.com" class="contact-link">shoaibkhalid.dev@gmail.com</a>
+  <!-- Summary chips -->
+  <div class="summary-row">
+    <div class="summary-chip">
+      <span class="chip-value">Zero</span>
+      <span class="chip-label">Data Collected</span>
     </div>
+    <div class="summary-chip">
+      <span class="chip-value">Local</span>
+      <span class="chip-label">Storage Only</span>
+    </div>
+    <div class="summary-chip">
+      <span class="chip-value">None</span>
+      <span class="chip-label">3rd Party SDKs</span>
+    </div>
+  </div>
+
+  <!-- 1. Introduction -->
+  <div class="section-card">
+    <div class="section-header">
+      <div class="section-header-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+      </div>
+      <span class="section-title">Introduction</span>
+    </div>
+    <div class="section-body">
+      <p>Progressly ("the App") is a personal productivity application developed by Muhammad Shoaib Khalid ("Developer", "we", "us"). This Privacy Policy explains how the App handles information when you use it on your Android device.</p>
+      <p>We are committed to protecting your privacy. This policy is intentionally simple because the App is designed with an offline-first, privacy-first architecture — your data belongs to you and stays with you.</p>
+    </div>
+  </div>
+
+  <!-- 2. What We Don't Collect -->
+  <div class="section-card">
+    <div class="section-header">
+      <div class="section-header-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2L4 5v6c0 5.55 3.84 10.74 8 12 4.16-1.26 8-6.45 8-12V5l-8-3zm-2 13l-2-2 1.41-1.41L10 12.17l4.59-4.58L16 9l-6 6z"/></svg>
+      </div>
+      <span class="section-title">Information We Do Not Collect</span>
+    </div>
+    <div class="section-body">
+      <p>Progressly does <strong>not</strong> collect, transmit, store remotely, or share any of the following:</p>
+      <ul class="item-list">
+        <li><span class="item-dot"></span>Personal identification information (name, email, phone number)</li>
+        <li><span class="item-dot"></span>Account credentials or login information</li>
+        <li><span class="item-dot"></span>Location data of any kind</li>
+        <li><span class="item-dot"></span>Device identifiers or advertising IDs</li>
+        <li><span class="item-dot"></span>Usage analytics or crash reports sent to external servers</li>
+        <li><span class="item-dot"></span>Any content you enter — tasks, goals, notes, or work durations</li>
+      </ul>
+      <div class="divider"></div>
+      <p>The App has no internet connectivity. There are no third-party analytics, advertising SDKs, or tracking libraries of any kind.</p>
+    </div>
+  </div>
+
+  <!-- 3. Local Data -->
+  <div class="section-card">
+    <div class="section-header">
+      <div class="section-header-icon">
+        <svg viewBox="0 0 24 24"><path d="M20 6H4V4H2v16h2v-2h16v2h2V4h-2v2zm0 10H4V8h16v8z"/></svg>
+      </div>
+      <span class="section-title">Data Stored on Your Device</span>
+    </div>
+    <div class="section-body">
+      <p>All data you create within Progressly is stored exclusively on your device using Android's Room (SQLite) database and Jetpack DataStore. This includes:</p>
+      <ul class="item-list">
+        <li><span class="item-dot"></span>Daily task entries — title, description, satisfaction rating, remarks</li>
+        <li><span class="item-dot"></span>Work session durations — start time, end time, computed duration</li>
+        <li><span class="item-dot"></span>Goals — title, description, priority classifications, completion status</li>
+        <li><span class="item-dot"></span>App preferences — theme mode, color scheme selection</li>
+        <li><span class="item-dot"></span>Onboarding completion state</li>
+      </ul>
+      <div class="divider"></div>
+      <p>This data never leaves your device. It is not backed up to any server operated by us. Standard Android system backups (if enabled in your device settings) may include this data — this is controlled entirely by you and the Android OS, not by the App.</p>
+    </div>
+  </div>
+
+  <!-- 4. Permissions -->
+  <div class="section-card">
+    <div class="section-header">
+      <div class="section-header-icon">
+        <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+      </div>
+      <span class="section-title">Permissions Used</span>
+    </div>
+    <div class="section-body">
+      <p>The App requests only the following permissions, each used solely for core functionality:</p>
+
+      <div class="permission-card">
+        <div class="perm-icon">
+          <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12zM6 10h2v2H6v-2zm0 4h8v2H6v-2zm10 0h2v2h-2v-2zm-6-4h8v2h-8v-2z"/></svg>
+        </div>
+        <div class="perm-info">
+          <div class="perm-name">POST_NOTIFICATIONS</div>
+          <div class="perm-desc">Required on Android 13+ to display the persistent foreground service notification while a work session timer is active. No notifications are sent for marketing or tracking purposes.</div>
+        </div>
+      </div>
+
+      <div class="permission-card">
+        <div class="perm-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+        </div>
+        <div class="perm-info">
+          <div class="perm-name">FOREGROUND_SERVICE</div>
+          <div class="perm-desc">Used to keep the work session timer running accurately when the app is backgrounded or the screen is off. The service writes session data only to the local Room database — never to any remote server.</div>
+        </div>
+      </div>
+
+      <p style="margin-top:10px">No other permissions are requested. The App does not access contacts, camera, microphone, storage, or location.</p>
+    </div>
+  </div>
+
+  <!-- 5. Third-Party Services -->
+  <div class="section-card">
+    <div class="section-header">
+      <div class="section-header-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+      </div>
+      <span class="section-title">Third-Party Services</span>
+    </div>
+    <div class="section-body">
+      <p>Progressly does not integrate with any third-party services, APIs, or SDKs that collect data. There are no advertisements, no analytics platforms (such as Firebase or Crashlytics), and no external dependencies that communicate over the network.</p>
+    </div>
+  </div>
+
+  <!-- 6. Children -->
+  <div class="section-card">
+    <div class="section-header">
+      <div class="section-header-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      </div>
+      <span class="section-title">Children's Privacy</span>
+    </div>
+    <div class="section-body">
+      <p>Progressly is a general-purpose productivity tool not directed at children under the age of 13. Since the App collects no personal data from any user, no special measures for children's data are applicable beyond this statement.</p>
+    </div>
+  </div>
+
+  <!-- 7. Deletion -->
+  <div class="section-card">
+    <div class="section-header">
+      <div class="section-header-icon">
+        <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+      </div>
+      <span class="section-title">Data Deletion</span>
+    </div>
+    <div class="section-body">
+      <p>Because all data is stored locally on your device, you have full control at all times. You can delete individual tasks, durations, or goals directly from within the App using the delete actions on each screen.</p>
+      <p>To remove all App data permanently, simply uninstall the App. There is no account to delete and no server-side data to request removal of.</p>
+    </div>
+  </div>
+
+  <!-- 8. Changes -->
+  <div class="section-card">
+    <div class="section-header">
+      <div class="section-header-icon">
+        <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 000-1.41l-2.34-2.34a1 1 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+      </div>
+      <span class="section-title">Changes to This Policy</span>
+    </div>
+    <div class="section-body">
+      <p>If we make material changes to this Privacy Policy, the updated policy will be published at the same URL with a revised effective date. Continued use of the App after changes are posted constitutes acceptance of the updated policy.</p>
+    </div>
+  </div>
+
+  <!-- 9. Contact -->
+  <div class="contact-card">
+    <div class="badge">
+      <svg viewBox="0 0 24 24" width="10" height="10" style="fill:var(--on-primary-container)"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+      Contact
+    </div>
+    <p>Have questions about this Privacy Policy?<br>Reach out and we'll respond as soon as possible.</p>
+    <a href="mailto:shoaibkhalid.dev@gmail.com" class="contact-btn">
+      <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+      shoaibkhalid.dev@gmail.com
+    </a>
   </div>
 
   <div class="footer">
