@@ -37,7 +37,7 @@ class AppPreferencesDataStore @Inject constructor(
     }
 
     val useDynamicColor: Flow<Boolean> = dataStore.data.map { prefs ->
-        prefs[PreferencesKey.USE_DYNAMIC_COLOR] ?: false
+        prefs[PreferencesKey.USE_DYNAMIC_COLOR] ?: true
     }
 
     val onboardingComplete: Flow<Boolean> = dataStore.data.map { prefs ->
