@@ -1,5 +1,6 @@
 package com.gshoaib998.progressly.ui.settings
 
+import android.os.Build
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gshoaib998.progressly.data.local.datastore.AppPreferencesDataStore
@@ -34,10 +35,11 @@ class AppPreferencesViewModel @Inject constructor(
         dataStore.useDynamicColor,
         dataStore.onboardingComplete
     ) { scheme, mode, dynamicColor,onboarding ->
+        val effectiveDynamicColor = dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
         AppPreferencesState.Ready(
             colorScheme = scheme,
             themeMode = mode,
-            useDynamicColor = dynamicColor,
+            useDynamicColor = effectiveDynamicColor,
             onboardingComplete = onboarding
         )
     }.stateIn(
