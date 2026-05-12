@@ -2,7 +2,7 @@
 
 # Progressly
 
-**A modern Android productivity app for tracking daily tasks, work durations, and long-term goals — with an analytics dashboard built on top.**
+**A modern Android productivity app for tracking daily tasks, work durations, and long-term goals — with an analytics dashboard built on top**
 
 [![Android](https://img.shields.io/badge/Platform-Android-3DDC84?style=flat-square&logo=android&logoColor=white)](https://developer.android.com)
 [![Kotlin](https://img.shields.io/badge/Language-Kotlin-7F52FF?style=flat-square&logo=kotlin&logoColor=white)](https://kotlinlang.org)
