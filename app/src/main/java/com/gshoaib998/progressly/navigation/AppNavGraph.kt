@@ -145,11 +145,10 @@ fun AppBottomBar(navHostController: NavHostController, currentRoute: String?) {
                 label = {
                     Text(
                         text = destination.title,
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = if (currentRoute == destination.route) FontWeight.SemiBold else FontWeight.Normal
                     )
                 },
-                alwaysShowLabel = false
+                alwaysShowLabel = true
 
             )
         }
