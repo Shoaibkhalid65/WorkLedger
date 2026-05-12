@@ -80,16 +80,16 @@ fun TaskDurationScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Surface(
-                    color = MaterialTheme.colorScheme.surfaceVariant,
-                    shape = RoundedCornerShape(24.dp),
-                    modifier = Modifier.size(80.dp)
+                    color = MaterialTheme.colorScheme.tertiaryContainer,
+                    shape = RoundedCornerShape(28.dp),
+                    modifier = Modifier.size(88.dp)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             imageVector = Icons.Default.Schedule,
                             contentDescription = null,
-                            modifier = Modifier.size(36.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            modifier = Modifier.size(40.dp),
+                            tint = MaterialTheme.colorScheme.onTertiaryContainer
                         )
                     }
                 }

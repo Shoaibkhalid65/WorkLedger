@@ -36,7 +36,8 @@ fun GoalBadge(label: String, color: GoalBadgeColor) {
             text = label,
             color = contentColor,
             fontSize = 11.sp,
-            fontWeight = FontWeight.Medium,
+            fontWeight = FontWeight.SemiBold,
+            letterSpacing = 0.3.sp,
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
         )
     }

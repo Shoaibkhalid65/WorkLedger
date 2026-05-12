@@ -21,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.Button
@@ -271,6 +272,7 @@ fun CreateEditTaskScreen(
         // ── Dialogs ───────────────────────────────────────────────────
         if (uiState.showSelectSatisfyPerDialog) {
             SelectSatisfyPercentageDialog(
+                currentPercentage = uiState.satisfyPercentage,
                 onDismiss = { viewModel.updateShowPercentageDialog(false) }
             ) { percentage ->
                 viewModel.updateSatisfyPercentage(percentage)
@@ -505,6 +507,7 @@ fun TimeChip(
 
 @Composable
 fun SelectSatisfyPercentageDialog(
+    currentPercentage: SatisfyPercentage,
     onDismiss: () -> Unit,
     onConfirm: (SatisfyPercentage) -> Unit
 ) {
@@ -526,6 +529,7 @@ fun SelectSatisfyPercentageDialog(
                 )
 
                 SatisfyPercentage.entries.forEach { satisfyPercentage ->
+                    val isSelected = satisfyPercentage == currentPercentage
                     Surface(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -534,7 +538,10 @@ fun SelectSatisfyPercentageDialog(
                                 onConfirm(satisfyPercentage)
                                 onDismiss()
                             },
-                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                        color = if (isSelected)
+                            MaterialTheme.colorScheme.primaryContainer
+                        else
+                            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
                         shape = RoundedCornerShape(10.dp)
                     ) {
                         Row(
@@ -547,7 +554,9 @@ fun SelectSatisfyPercentageDialog(
                             Text(
                                 text = "${satisfyPercentage.text}%",
                                 style = MaterialTheme.typography.bodyLarge,
-                                fontWeight = FontWeight.Medium
+                                fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
+                                color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer
+                                else MaterialTheme.colorScheme.onSurface
                             )
                             val level = when {
                                 satisfyPercentage.text >= 80 -> "Excellent"
@@ -555,11 +564,24 @@ fun SelectSatisfyPercentageDialog(
                                 satisfyPercentage.text >= 40 -> "Average"
                                 else -> "Needs work"
                             }
-                            Text(
-                                text = level,
-                                style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = level, // your existing level label
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                if (isSelected) {
+                                    Icon(
+                                        Icons.Default.Check,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                }
+                            }
                         }
                     }
                 }
